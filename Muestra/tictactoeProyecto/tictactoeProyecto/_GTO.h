@@ -396,11 +396,11 @@ private: System::Void button11_Click(System::Object^  sender, System::EventArgs^
 {
 	try 
 	{
-		_Socket = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
-		_Socket->Connect(gcnew IPEndPoint(IPAddress::Parse("127.0.0.1"), 5000));
-		if (_Socket->IsBound) 
+		Cliente = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
+		Cliente->Connect(gcnew IPEndPoint(IPAddress::Parse("127.0.0.1"), 5000));
+		if (Cliente->IsBound) 
 		{
-			label1->Text = String::Concat("Conected to:", _Socket->RemoteEndPoint->ToString());
+			label1->Text = String::Concat("Conected to:", Cliente->RemoteEndPoint->ToString());
 			GameReady = true;
 			player = 'O';
 		}
@@ -506,9 +506,16 @@ private: System::Void button13_Click(System::Object^  sender, System::EventArgs^
 	}
 private: System::Void button12_Click(System::Object^  sender, System::EventArgs^  e)
 {
-	_Socket->Close();//Cerramos el socket principal
-	
+	if (IsServer)
+	{
+		_Socket->Close();//Cerramos el socket principal
+		label1->Text = "Server Disconected";
+	}
+	else
+	{
+		Cliente->Close();
+		label1->Text = "Client Disconected";
+	}
 }
-
 };
 }
