@@ -416,28 +416,37 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 {
 	if(GameReady)
 	{
-		 
+		if (Tablero[0] == 0)
+		{
 			Tablero[0] = player;
 			UpdateForms();
 			SendGameData();
 			ReciveGameData();
 			UpdateForms();
+		}
 	}
 }
 private: System::Void button6_Click(System::Object^  sender, System::EventArgs^  e) 
 {
 	if (GameReady)
 	{
-		Tablero[1] = player;
-		UpdateForms();
+		if (Tablero[1] == 0)
+		{
+			Tablero[1] = player;
+			UpdateForms();
+		}
 	}
 }
 private: System::Void button9_Click(System::Object^  sender, System::EventArgs^  e)
 {
 	if (GameReady)
 	{
-		Tablero[2] = player;
-		UpdateForms();
+		if (Tablero[2] == 0)
+		{
+			Tablero[2] = player;
+			UpdateForms();
+		}
+		
 	}
 }
 
@@ -445,8 +454,13 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 {
 	if (GameReady)
 	{
-		Tablero[3] = player;
-		UpdateForms();
+		if (Tablero[3] == 0)
+		{
+			Tablero[3] = player;
+			UpdateForms();
+
+
+		}
 	}
 }
 
@@ -454,8 +468,11 @@ private: System::Void button5_Click(System::Object^  sender, System::EventArgs^ 
 {
 	if (GameReady)
 	{
-		Tablero[4] = player;
-		UpdateForms();
+		if (Tablero[4] == 0)
+		{
+			Tablero[4] = player;
+			UpdateForms();
+		}
 	}
 }
 
@@ -463,37 +480,55 @@ private: System::Void button8_Click(System::Object^  sender, System::EventArgs^ 
 {
 	if (GameReady)
 	{
-		Tablero[5] = player;
-		UpdateForms();
+		if (Tablero[5] == 0) 
+		{
+			Tablero[5] = player;
+			UpdateForms();
+		}
 	}
 }
 
-private: System::Void button7_Click(System::Object^  sender, System::EventArgs^  e)
-{
-	if (GameReady)
-	{
-		Tablero[8] = player;
-		UpdateForms();
-	}
-}
 
-private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	if (GameReady)
-	{
-		Tablero[7] = player;
-		UpdateForms();
-	}
-}
+
 
 private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) 
 {
 	if (GameReady)
 	{
-		Tablero[6] = player;
-		UpdateForms();
+		if (Tablero[6] == 0) 
+		{
+			Tablero[6] = player;
+			UpdateForms();
+		}
+		
 	}
 }
+
+	private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e)
+		 {
+			 if (GameReady)
+			 {
+				 if (Tablero[7] == 0)
+				 {
+					 Tablero[7] = player;
+					 UpdateForms();
+				 }
+
+			 }
+		 }
+
+			 private: System::Void button7_Click(System::Object^  sender, System::EventArgs^  e)
+			 {
+				 if (GameReady)
+				 {
+					 if (Tablero[8] == 0)
+					 {
+						 Tablero[8] = player;
+						 UpdateForms();
+					 }
+
+				 }
+			 }
 
 private: System::Void label1_Click(System::Object^  sender, System::EventArgs^  e) 
 {
