@@ -7,9 +7,13 @@ namespace tictactoeProyecto {
 	using namespace System::Collections;
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
+
 	using namespace System::Drawing;
+
 	using namespace System::Net::Sockets;
 	using namespace System::Net;
+
+
 	using namespace System::Text;
 	using namespace System::Threading;
 	/// <summary>
@@ -17,19 +21,21 @@ namespace tictactoeProyecto {
 	/// </summary>
 	public ref class _GTO : public System::Windows::Forms::Form
 	{
+
 		Socket ^_Socket, ^Cliente;
-	
+
 
 		bool GameReady = false;
 
 		array<Byte> ^ Tablero;
 		Byte VictoriasA;
 		Byte VictoriasB;
-		Byte Turno;
+		int Turno;
 
 		char player;
-		bool IsServer=false;
+		bool IsServer = false;
 		bool IsConected = false;
+
 	    private: System::Windows::Forms::Button^  button12;
 	    private: System::Windows::Forms::Label^  label5;
 	private: System::Windows::Forms::Label^  label6;
@@ -42,6 +48,8 @@ namespace tictactoeProyecto {
 		
 		
 	public:
+	
+	
 
 		_GTO(void)
 		{
@@ -63,6 +71,7 @@ namespace tictactoeProyecto {
 			//TO DO: AÑADIR EXCEPCIONES
 			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
 			label5->Text =String::Concat("Bytes enviados:", BytesSended.ToString());
+			Turno ++;
 		}
 
 		void SendGameDataClient()//Enviamos el tablero
@@ -70,6 +79,7 @@ namespace tictactoeProyecto {
 			//TO DO: AÑADIR EXCEPCIONES
 			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
 			label5->Text = String::Concat("Bytes enviados:", BytesSended.ToString());
+			Turno++;
 		}
 
 		void Send() 
@@ -99,6 +109,7 @@ namespace tictactoeProyecto {
 
 		void HoldForData()
 		{
+			UpdateForms();
 			try
 			{
 				while (1) 
@@ -118,25 +129,25 @@ namespace tictactoeProyecto {
 		
 		}
 
-	private:	 void UpdateForms()
+	 void UpdateForms()
 		{
 		
 			//Labels 
 		
 
-		this->label2->Text = String::Concat("Jugador1 pts: ", VictoriasA.ToString());
-		this->label3->Text = String::Concat("Jugador2 pts : ", VictoriasB.ToString());
-		this->label4->Text = String::Concat("Turno: ", Turno.ToString());
+		label2->Text = String::Concat("Jugador1 pts: ", VictoriasA.ToString());
+		label3->Text = String::Concat("Jugador2 pts : ", VictoriasB.ToString());
+		label4->Text = String::Concat("Turno: ", Turno.ToString());
 			//ARRAY TO GRAPHICAL TEXT;
-		this->button1->Text = Convert::ToChar(Tablero[0]).ToString();
-		this->button6->Text = Convert::ToChar(Tablero[1]).ToString();
-		this->button9->Text = Convert::ToChar(Tablero[2]).ToString();
-		this->button2->Text = Convert::ToChar(Tablero[3]).ToString();
-		this->button5->Text = Convert::ToChar(Tablero[4]).ToString();
-		this->button8->Text = Convert::ToChar(Tablero[5]).ToString();
-		this->button3->Text = Convert::ToChar(Tablero[6]).ToString();
-		this->button4->Text = Convert::ToChar(Tablero[7]).ToString();
-		this->button7->Text = Convert::ToChar(Tablero[8]).ToString();
+		button1->Text = Convert::ToChar(Tablero[0]).ToString();
+		button6->Text = Convert::ToChar(Tablero[1]).ToString();
+		button9->Text = Convert::ToChar(Tablero[2]).ToString();
+		button2->Text = Convert::ToChar(Tablero[3]).ToString();
+		button5->Text = Convert::ToChar(Tablero[4]).ToString();
+		button8->Text = Convert::ToChar(Tablero[5]).ToString();
+		button3->Text = Convert::ToChar(Tablero[6]).ToString();
+		button4->Text = Convert::ToChar(Tablero[7]).ToString();
+		button7->Text = Convert::ToChar(Tablero[8]).ToString();
 			
 		}
 
@@ -178,7 +189,7 @@ namespace tictactoeProyecto {
 	private: System::Windows::Forms::Button^  button9;
 	private: System::Windows::Forms::Button^  button8;
 	private: System::Windows::Forms::Button^  button7;
-private: System::ComponentModel::IContainer^  components;
+  private: System::ComponentModel::IContainer^  components;
 
 
 
@@ -542,12 +553,14 @@ private: System::Void button6_Click(System::Object^  sender, System::EventArgs^ 
 		if (Tablero[1] == 0)
 		{
 			Tablero[1] = player;
-			
-			Send();
 			UpdateForms();
-			HoldForData();
+			Send();
 		
+			HoldForData();
 			
+			
+				
+			}
 		}
 	}
 }
@@ -571,7 +584,7 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 {
 	if (GameReady)
 	{
-		if (Tablero[3] == 0)
+		if (Tablero[3] == 0 )
 		{
 			
 			Tablero[3] = player;
@@ -626,8 +639,6 @@ private: System::Void button3_Click(System::Object^  sender, System::EventArgs^ 
 			Send();
 			UpdateForms();
 			HoldForData();
-	
-			
 		}
 		
 	}
@@ -689,4 +700,3 @@ private: System::Void button12_Click(System::Object^  sender, System::EventArgs^
 	}
 }
 };
-}
