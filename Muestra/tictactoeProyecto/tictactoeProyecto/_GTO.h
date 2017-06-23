@@ -47,12 +47,16 @@ namespace tictactoeProyecto {
 			
 		}
 		//variables 
+
 		//app functions
 	
 		void SendGameData()
 		{
-
+			//TO DO: AÑADIR EXCEPCIONES
+			int BytesSended = _Socket->Send(Tablero, sizeof(Byte) * 9, SocketFlags::None);
+			label5->Text = BytesSended.ToString();
 		}
+
 		void ReciveGameData()
 		{
 
@@ -60,6 +64,15 @@ namespace tictactoeProyecto {
 
 		void UpdateNetwork() 
 		{
+
+			if (IsServer) 
+			{
+			
+			}
+			else
+			{
+
+			}
 
 		}
 
@@ -81,7 +94,13 @@ namespace tictactoeProyecto {
 			button7->Text = Convert::ToChar(Tablero[8]).ToString();
 		}
 
-
+		void ResetGame() 
+		{
+			for (int i = 0; i < 9; i++)
+			{
+				Tablero[i] = 0;
+			}
+		}
 
 
 	protected:
@@ -411,7 +430,7 @@ private: System::Void button11_Click(System::Object^  sender, System::EventArgs^
 	}
 }
 
-
+//TODO, EL CODIGO AQUI REPRESENTA LA MISMA FUNCIONALIDAD EN CADA BOTON PERO CON DIFERENTE INDICE EN TABLERO
 private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) 
 {
 	if(GameReady)
