@@ -27,8 +27,10 @@ namespace tictactoeProyecto {
 
 		char player;
 		bool IsServer=false;
+		bool IsConected = false;
 	    private: System::Windows::Forms::Button^  button12;
-	private: System::Windows::Forms::Label^  label5;
+	    private: System::Windows::Forms::Label^  label5;
+	private: System::Windows::Forms::Label^  label6;
 	private: System::Windows::Forms::Label^  label4;
 			 
 		
@@ -54,11 +56,21 @@ namespace tictactoeProyecto {
 		{
 			//TO DO: AÑADIR EXCEPCIONES
 			int BytesSended = _Socket->Send(Tablero, sizeof(Byte) * 9, SocketFlags::None);
-			label5->Text = BytesSended.ToString();
+			label5->Text =String::Concat("Bytes enviados:", BytesSended.ToString());
+		
 		}
 
-		void ReciveGameData()
+		void ReciveGameDataClient()
 		{
+			 _Socket->Receive(Tablero, sizeof(Byte) * 9, SocketFlags::None);
+		//	label6->Text = String::Concat("bytes recividos:", BytesRecived);
+
+		}
+
+		void ReciveGameDataServer()
+		{
+			int BytesRecived = Cliente->Receive(Tablero, sizeof(Byte) * 9, SocketFlags::None);
+			label6->Text = String::Concat("bytes recividos:", BytesRecived);
 
 		}
 
@@ -67,11 +79,11 @@ namespace tictactoeProyecto {
 
 			if (IsServer) 
 			{
-			
+				ReciveGameDataServer();
 			}
 			else
 			{
-
+				ReciveGameDataClient();
 			}
 
 		}
@@ -175,6 +187,7 @@ namespace tictactoeProyecto {
 			this->label4 = (gcnew System::Windows::Forms::Label());
 			this->button12 = (gcnew System::Windows::Forms::Button());
 			this->label5 = (gcnew System::Windows::Forms::Label());
+			this->label6 = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// label3
@@ -340,18 +353,29 @@ namespace tictactoeProyecto {
 			// 
 			this->label5->AutoSize = true;
 			this->label5->ImageAlign = System::Drawing::ContentAlignment::MiddleRight;
-			this->label5->Location = System::Drawing::Point(230, 127);
+			this->label5->Location = System::Drawing::Point(12, 231);
 			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(32, 13);
+			this->label5->Size = System::Drawing::Size(79, 13);
 			this->label5->TabIndex = 35;
-			this->label5->Text = L"bytes";
+			this->label5->Text = L"Bytes enviados";
+			// 
+			// label6
+			// 
+			this->label6->AutoSize = true;
+			this->label6->ImageAlign = System::Drawing::ContentAlignment::MiddleRight;
+			this->label6->Location = System::Drawing::Point(12, 257);
+			this->label6->Name = L"label6";
+			this->label6->Size = System::Drawing::Size(77, 13);
+			this->label6->TabIndex = 36;
+			this->label6->Text = L"bytes recividos";
 			// 
 			// _GTO
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(394, 238);
+			this->ClientSize = System::Drawing::Size(394, 324);
 			this->ControlBox = false;
+			this->Controls->Add(this->label6);
 			this->Controls->Add(this->label5);
 			this->Controls->Add(this->button12);
 			this->Controls->Add(this->label4);
@@ -403,6 +427,16 @@ private: System::Void button10_Click(System::Object^  sender, System::EventArgs^
 			IsServer = true;
 			player = 'X';
 			GameReady = true;
+			//Recive the message
+			//UpdateNetwork();//Esperamos a que llegue un mensaje
+
+			if (Cliente->Available>0) 
+			{
+				array<Byte> ^data = gcnew array<Byte>(1);
+				int bytesS = Cliente->Receive(data, 1, SocketFlags::None);
+				label6->Text = bytesS.ToString();
+			}
+			
 		}
 	}
 	catch(System::Net::Sockets::SocketException^ error)
@@ -422,6 +456,11 @@ private: System::Void button11_Click(System::Object^  sender, System::EventArgs^
 			label1->Text = String::Concat("Conected to:", Cliente->RemoteEndPoint->ToString());
 			GameReady = true;
 			player = 'O';
+			//UpdateNetwork();//Esperamos a que llegue un mensaje
+			array<Byte> ^data = gcnew array<Byte>(1);
+			data[0] = 43;//Initial Network Code
+			int bytesS = Cliente->Send(data, 1, SocketFlags::None);
+			label5->Text = bytesS.ToString();
 		}
 	}
 	catch (System::Net::Sockets::SocketException^ error)
@@ -440,7 +479,7 @@ private: System::Void button1_Click(System::Object^  sender, System::EventArgs^ 
 			Tablero[0] = player;
 			UpdateForms();
 			SendGameData();
-			ReciveGameData();
+			UpdateNetwork();
 			UpdateForms();
 		}
 	}

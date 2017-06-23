@@ -19,6 +19,8 @@ Class tictactoeProyecto._GTO: AutoLayout, AnsiClass, Class, Public, BeforeFieldI
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Methods:
     SendGameData(): PrivateScope, Public, HideBySig
-    ReciveGameData(): PrivateScope, Public, HideBySig
+    ReciveGameDataClient(): PrivateScope, Public, HideBySig
+    ReciveGameDataServer(): PrivateScope, Public, HideBySig
     UpdateNetwork(): PrivateScope, Public, HideBySig
     UpdateForms(): PrivateScope, Public, HideBySig
+    ResetGame(): PrivateScope, Public, HideBySig
