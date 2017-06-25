@@ -18,9 +18,9 @@ Class tictactoeProyecto._GTO: AutoLayout, AnsiClass, Class, Public, BeforeFieldI
   :System.Windows.Forms.Form
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Methods:
-    SendGameData(): PrivateScope, Public, HideBySig
-    ReciveGameDataClient(): PrivateScope, Public, HideBySig
-    ReciveGameDataServer(): PrivateScope, Public, HideBySig
-    UpdateNetwork(): PrivateScope, Public, HideBySig
+    Send(): PrivateScope, Public, HideBySig
+    ReciveGameData(): PrivateScope, Public, HideBySig
+    HoldForData(): PrivateScope, Public, HideBySig
     UpdateForms(): PrivateScope, Public, HideBySig
+    CheckBoardFor(SByte IsSignUnspecifiedByte): PrivateScope, Public, HideBySig
     ResetGame(): PrivateScope, Public, HideBySig

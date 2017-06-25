@@ -257,7 +257,7 @@ namespace tictactoeProyecto
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(208, 154);
+			this->label3->Location = System::Drawing::Point(208, 215);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(66, 13);
 			this->label3->TabIndex = 30;
@@ -266,7 +266,7 @@ namespace tictactoeProyecto
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(208, 140);
+			this->label2->Location = System::Drawing::Point(208, 201);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(66, 13);
 			this->label2->TabIndex = 29;
@@ -276,7 +276,7 @@ namespace tictactoeProyecto
 			// 
 			this->label1->AutoSize = true;
 			this->label1->ImageAlign = System::Drawing::ContentAlignment::MiddleRight;
-			this->label1->Location = System::Drawing::Point(12, 280);
+			this->label1->Location = System::Drawing::Point(12, 257);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(44, 13);
 			this->label1->TabIndex = 28;
@@ -396,7 +396,7 @@ namespace tictactoeProyecto
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(207, 127);
+			this->label4->Location = System::Drawing::Point(207, 188);
 			this->label4->Name = L"label4";
 			this->label4->Size = System::Drawing::Size(32, 13);
 			this->label4->TabIndex = 33;
@@ -426,7 +426,7 @@ namespace tictactoeProyecto
 			// 
 			this->label6->AutoSize = true;
 			this->label6->ImageAlign = System::Drawing::ContentAlignment::MiddleRight;
-			this->label6->Location = System::Drawing::Point(12, 257);
+			this->label6->Location = System::Drawing::Point(12, 244);
 			this->label6->Name = L"label6";
 			this->label6->Size = System::Drawing::Size(77, 13);
 			this->label6->TabIndex = 36;
