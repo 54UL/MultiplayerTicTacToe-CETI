@@ -31,9 +31,9 @@ namespace tictactoeProyecto
 
 		bool GameReady = false;
 		array<Byte> ^ Tablero;
-		Byte VictoriasA;
-		Byte VictoriasB;
-		int Turno;
+		array<Byte> ^ ExtraData;
+
+
 		char player;//Current Tooken selected
 		bool IsRunning=true;
 		bool IsServer = false;
@@ -55,37 +55,19 @@ namespace tictactoeProyecto
 			//TODO: agregar código de constructor aquí
 			//Initialze the network data
 			Tablero = gcnew array<unsigned char>(9);
-			VictoriasA = 0;
-			VictoriasB = 0;
-			Turno = 0;
+			ExtraData = gcnew array<unsigned char>(4);
 		}
 		//variables 
-
 		//app functions
-
-		//Transmission Overview :  XXXXXXXXX--X----X----------X---------X-X
-		//                         TABLERO   TURNO VICTORIASA VICTORIASB  Status
-		//Send data es lo mismo :U (cambiar esto)
-		void SendGameDataServer()//Enviamos el tablero y otra informacion
-		{
-			//TO DO: AÑADIR EXCEPCIONES
-			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
-			label5->Text = String::Concat("Bytes enviados:", BytesSended.ToString());
-		}
-
-		void SendGameDataClient()//Enviamos el tablero y otra informacion
-		{
-			//TO DO: AÑADIR EXCEPCIONES
-			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
-			label5->Text = String::Concat("Bytes enviados:", BytesSended.ToString());
-		}
 
 		void Send()
 		{
-			if (IsServer)
-				SendGameDataServer();
-			else
-				SendGameDataClient();
+			//Transmission Overview :  XXXXXXXXX--X----X----------X-----------X
+			//                         TABLERO   TURNO VICTORIASA VICTORIASB  Status
+			//TO DO: AÑADIR EXCEPCIONES
+			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
+			int ByteS2 = Cliente->Send(ExtraData, 4, SocketFlags::None);
+			label5->Text = String::Concat("Bytes enviados:", (BytesSended + ByteS2).ToString());
 		}
 
 		void ReciveGameData()
@@ -94,7 +76,9 @@ namespace tictactoeProyecto
 			{
 				//FirstPartOfTheTransmission...
 				int BytesRecived = Cliente->Receive(Tablero, 9, SocketFlags::None);
-				label6->Text = String::Concat("bytes recividos:", BytesRecived);
+				int BytesRecived2 = Cliente->Receive(ExtraData, 4, SocketFlags::None);
+				label6->Text = String::Concat("bytes recividos:", (BytesRecived+BytesRecived2).ToString());
+				
 			}
 		}
 
@@ -116,9 +100,8 @@ namespace tictactoeProyecto
 		void UpdateForms(void) //thread func1
 		{
 			
-			Monitor::Enter(VictoriasA);
-			Monitor::Enter(VictoriasB);
-			Monitor::Enter(Turno);
+			
+			Monitor::Enter(ExtraData);
 			Monitor::Enter(label2);
 			Monitor::Enter(label3);
 			Monitor::Enter(label4);
@@ -137,9 +120,9 @@ namespace tictactoeProyecto
 			{
 				Thread::Sleep(60);
 				//Labels 
-				label2->Text = String::Concat("Jugador1 pts: ", VictoriasA.ToString());
-				label3->Text = String::Concat("Jugador2 pts : ", VictoriasB.ToString());
-				label4->Text = String::Concat("Turno: ", Turno.ToString());
+				label2->Text = String::Concat("Jugador1 pts: ", ExtraData[1].ToString());
+				label3->Text = String::Concat("Jugador2 pts : ", ExtraData[2].ToString());
+				label4->Text = String::Concat("Turn: ", ExtraData[0].ToString());
 				//ARRAY TO GRAPHICAL TEXT;
 				button1->Text = Convert::ToChar(Tablero[0]).ToString();
 				button6->Text = Convert::ToChar(Tablero[1]).ToString();
@@ -151,11 +134,7 @@ namespace tictactoeProyecto
 				button4->Text = Convert::ToChar(Tablero[7]).ToString();
 				button7->Text = Convert::ToChar(Tablero[8]).ToString();
 			}
-
-		
-			Monitor::Exit(VictoriasA);
-			Monitor::Exit(VictoriasB);
-			Monitor::Exit(Turno);
+			Monitor::Exit(ExtraData);
 			Monitor::Exit(label2);
 			Monitor::Exit(label3);
 			Monitor::Exit(label4);
@@ -171,15 +150,22 @@ namespace tictactoeProyecto
 		}
 
 		
+		bool CheckBoardFor(char PlayerToken) 
+		{
+		
+		
+		}
 		
 		void ResetGame()
 		{
-			
+			NetworkThread->Abort();
 			for (int i = 0; i < 9; i++)
 			{
 				Tablero[i] = 0;
 			}
 		}
+
+	
 
 
 	protected:
@@ -655,8 +641,6 @@ namespace tictactoeProyecto
    //exit button
     private: System::Void button13_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-	
-
 		this->Close();
 	}
 	//Disconnect
