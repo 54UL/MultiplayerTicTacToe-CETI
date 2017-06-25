@@ -3,9 +3,6 @@
 using namespace System::Windows::Forms;
 using namespace System;
 
-
-
-
 [STAThread]
 void main(array<String^> ^ argv) 
 {

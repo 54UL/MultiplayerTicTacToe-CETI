@@ -1,6 +1,7 @@
 #pragma once
 
-namespace tictactoeProyecto {
+namespace tictactoeProyecto
+{
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -12,147 +13,168 @@ namespace tictactoeProyecto {
 
 	using namespace System::Net::Sockets;
 	using namespace System::Net;
-
-
-	using namespace System::Text;
 	using namespace System::Threading;
+	using namespace System::Text;
+	
+
 	/// <summary>
 	/// Resumen de _GTO
 	/// </summary>
+
+
+
 	public ref class _GTO : public System::Windows::Forms::Form
 	{
 
 		Socket ^_Socket, ^Cliente;
-
+		Thread ^ FormThread,^NetworkThread;
 
 		bool GameReady = false;
-
 		array<Byte> ^ Tablero;
 		Byte VictoriasA;
 		Byte VictoriasB;
 		int Turno;
-
-		char player;
+		char player;//Current Tooken selected
+		bool IsRunning=true;
 		bool IsServer = false;
 		bool IsConected = false;
 
-	    private: System::Windows::Forms::Button^  button12;
-	    private: System::Windows::Forms::Label^  label5;
+		
+
+	private: System::Windows::Forms::Button^  button12;
+	private: System::Windows::Forms::Label^  label5;
 	private: System::Windows::Forms::Label^  label6;
+    private: System::Windows::Forms::Label^  label4;
 
-
-
-
-	private: System::Windows::Forms::Label^  label4;
-			 
-		
-		
 	public:
-	
-	
 
 		_GTO(void)
 		{
 			InitializeComponent();
 			//
 			//TODO: agregar código de constructor aquí
+			//Initialze the network data
 			Tablero = gcnew array<unsigned char>(9);
 			VictoriasA = 0;
 			VictoriasB = 0;
 			Turno = 0;
-			
 		}
 		//variables 
 
 		//app functions
-	
-		void SendGameDataServer()//Enviamos el tablero
-		{
-			//TO DO: AÑADIR EXCEPCIONES
-			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
-			label5->Text =String::Concat("Bytes enviados:", BytesSended.ToString());
-			Turno ++;
-		}
 
-		void SendGameDataClient()//Enviamos el tablero
+		//Transmission Overview :  XXXXXXXXX--X----X----------X---------X-X
+		//                         TABLERO   TURNO VICTORIASA VICTORIASB  Status
+		//Send data es lo mismo :U (cambiar esto)
+		void SendGameDataServer()//Enviamos el tablero y otra informacion
 		{
 			//TO DO: AÑADIR EXCEPCIONES
 			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
 			label5->Text = String::Concat("Bytes enviados:", BytesSended.ToString());
-			Turno++;
 		}
 
-		void Send() 
+		void SendGameDataClient()//Enviamos el tablero y otra informacion
 		{
-		if(IsServer)
-			SendGameDataServer();
-		else
-		SendGameDataClient();
+			//TO DO: AÑADIR EXCEPCIONES
+			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
+			label5->Text = String::Concat("Bytes enviados:", BytesSended.ToString());
 		}
 
-		bool ReciveGameData()
+		void Send()
 		{
-			int conteo = 0;
+			if (IsServer)
+				SendGameDataServer();
+			else
+				SendGameDataClient();
+		}
+
+		void ReciveGameData()
+		{
 			if (Cliente->Available > 0)
 			{
+				//FirstPartOfTheTransmission...
 				int BytesRecived = Cliente->Receive(Tablero, 9, SocketFlags::None);
 				label6->Text = String::Concat("bytes recividos:", BytesRecived);
-				conteo++;
-				if (BytesRecived >= 9)
-				{
-					conteo = 0;
-					return true;
-				}
 			}
-			
 		}
 
 		void HoldForData()
 		{
-			UpdateForms();
 			try
 			{
-				while (1) 
+				while (NetworkThread->IsAlive)
 				{
-					
-					if (ReciveGameData())
-						break;
-						
+					ReciveGameData();
 				}
-				UpdateForms();
-				
 			}
-			catch (SocketException ^e) 
+			catch (SocketException ^e)
 			{
 				label1->Text = e->SocketErrorCode.ToString();
 			}
-		
 		}
 
-	 void UpdateForms()
+		void UpdateForms(void) //thread func1
 		{
-		
-			//Labels 
-		
+			
+			Monitor::Enter(VictoriasA);
+			Monitor::Enter(VictoriasB);
+			Monitor::Enter(Turno);
+			Monitor::Enter(label2);
+			Monitor::Enter(label3);
+			Monitor::Enter(label4);
+			Monitor::Enter(button1);
+			Monitor::Enter(button3);
+			Monitor::Enter(button4);
+			Monitor::Enter(button5);
+			Monitor::Enter(button6);
+			Monitor::Enter(button7);
+			Monitor::Enter(button8);
+			Monitor::Enter(button9);
+			
 
-		label2->Text = String::Concat("Jugador1 pts: ", VictoriasA.ToString());
-		label3->Text = String::Concat("Jugador2 pts : ", VictoriasB.ToString());
-		label4->Text = String::Concat("Turno: ", Turno.ToString());
-			//ARRAY TO GRAPHICAL TEXT;
-		button1->Text = Convert::ToChar(Tablero[0]).ToString();
-		button6->Text = Convert::ToChar(Tablero[1]).ToString();
-		button9->Text = Convert::ToChar(Tablero[2]).ToString();
-		button2->Text = Convert::ToChar(Tablero[3]).ToString();
-		button5->Text = Convert::ToChar(Tablero[4]).ToString();
-		button8->Text = Convert::ToChar(Tablero[5]).ToString();
-		button3->Text = Convert::ToChar(Tablero[6]).ToString();
-		button4->Text = Convert::ToChar(Tablero[7]).ToString();
-		button7->Text = Convert::ToChar(Tablero[8]).ToString();
+			
+			while (FormThread->IsAlive)
+			{
+				Thread::Sleep(60);
+				//Labels 
+				label2->Text = String::Concat("Jugador1 pts: ", VictoriasA.ToString());
+				label3->Text = String::Concat("Jugador2 pts : ", VictoriasB.ToString());
+				label4->Text = String::Concat("Turno: ", Turno.ToString());
+				//ARRAY TO GRAPHICAL TEXT;
+				button1->Text = Convert::ToChar(Tablero[0]).ToString();
+				button6->Text = Convert::ToChar(Tablero[1]).ToString();
+				button9->Text = Convert::ToChar(Tablero[2]).ToString();
+				button2->Text = Convert::ToChar(Tablero[3]).ToString();
+				button5->Text = Convert::ToChar(Tablero[4]).ToString();
+				button8->Text = Convert::ToChar(Tablero[5]).ToString();
+				button3->Text = Convert::ToChar(Tablero[6]).ToString();
+				button4->Text = Convert::ToChar(Tablero[7]).ToString();
+				button7->Text = Convert::ToChar(Tablero[8]).ToString();
+			}
+
+		
+			Monitor::Exit(VictoriasA);
+			Monitor::Exit(VictoriasB);
+			Monitor::Exit(Turno);
+			Monitor::Exit(label2);
+			Monitor::Exit(label3);
+			Monitor::Exit(label4);
+			Monitor::Exit(button1);
+			Monitor::Exit(button3);
+			Monitor::Exit(button4);
+			Monitor::Exit(button5);
+			Monitor::Exit(button6);
+			Monitor::Exit(button7);
+			Monitor::Exit(button8);
+			Monitor::Exit(button9);
 			
 		}
 
-		void ResetGame() 
+		
+		
+		void ResetGame()
 		{
+			
 			for (int i = 0; i < 9; i++)
 			{
 				Tablero[i] = 0;
@@ -168,7 +190,9 @@ namespace tictactoeProyecto {
 		{
 			if (components)
 			{
+				IsRunning = false;
 				delete components;
+				FormThread->Abort();
 			}
 		}
 
@@ -189,18 +213,7 @@ namespace tictactoeProyecto {
 	private: System::Windows::Forms::Button^  button9;
 	private: System::Windows::Forms::Button^  button8;
 	private: System::Windows::Forms::Button^  button7;
-  private: System::ComponentModel::IContainer^  components;
-
-
-
-
-
-
-
-
-
-	//variables
-    
+	private: System::ComponentModel::IContainer^  components;
 
 	private:
 		/// <summary>
@@ -239,7 +252,7 @@ namespace tictactoeProyecto {
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(210, 211);
+			this->label3->Location = System::Drawing::Point(208, 154);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(66, 13);
 			this->label3->TabIndex = 30;
@@ -248,7 +261,7 @@ namespace tictactoeProyecto {
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(210, 184);
+			this->label2->Location = System::Drawing::Point(208, 140);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(66, 13);
 			this->label2->TabIndex = 29;
@@ -258,7 +271,7 @@ namespace tictactoeProyecto {
 			// 
 			this->label1->AutoSize = true;
 			this->label1->ImageAlign = System::Drawing::ContentAlignment::MiddleRight;
-			this->label1->Location = System::Drawing::Point(280, 19);
+			this->label1->Location = System::Drawing::Point(12, 280);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(44, 13);
 			this->label1->TabIndex = 28;
@@ -378,7 +391,7 @@ namespace tictactoeProyecto {
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(210, 160);
+			this->label4->Location = System::Drawing::Point(207, 127);
 			this->label4->Name = L"label4";
 			this->label4->Size = System::Drawing::Size(32, 13);
 			this->label4->TabIndex = 33;
@@ -418,7 +431,7 @@ namespace tictactoeProyecto {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(394, 324);
+			this->ClientSize = System::Drawing::Size(283, 301);
 			this->ControlBox = false;
 			this->Controls->Add(this->label6);
 			this->Controls->Add(this->label5);
@@ -440,6 +453,7 @@ namespace tictactoeProyecto {
 			this->Controls->Add(this->button2);
 			this->Controls->Add(this->button1);
 			this->Cursor = System::Windows::Forms::Cursors::Cross;
+			this->DoubleBuffered = true;
 			this->ForeColor = System::Drawing::Color::DarkGoldenrod;
 			this->Name = L"_GTO";
 			this->Text = L"_GTO";
@@ -448,255 +462,222 @@ namespace tictactoeProyecto {
 			this->PerformLayout();
 
 		}
+
 #pragma endregion
-	
 
 
 	private: System::Void _GTO_Load(System::Object^  sender, System::EventArgs^  e)
 	{
-		//Thread^ oThread = gcnew Thread(gcnew ThreadStart(this,&_GTO::UpdateForms));
-		//oThread->Start();
-	}
-//Host Button
-private: System::Void button10_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	
-	try 
-	{
-		label1->Text = "Creating Server...";
-		_Socket = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
-		_Socket->Bind(gcnew IPEndPoint(0, 5000));
-		_Socket->Listen(0);
-		Cliente = _Socket->Accept();
-		if (Cliente != nullptr) 
-		{
-			label1->Text = "MatchCreated";
-			IsServer = true;
-			player = 'X';
-			GameReady = true;
-			//Recive the message
+		CheckForIllegalCrossThreadCalls = false; //alv usamos esta madre pa que funcione
+		FormThread = gcnew Thread(gcnew ThreadStart(this,&_GTO::UpdateForms)); //Initialize the form updater thread
 
-			//Esperamos a que llegue un mensaje
-			if (Cliente->Available>0) 
+	    NetworkThread  = gcnew Thread(gcnew ThreadStart(this, &_GTO::HoldForData)); //Initialize the NetworkThread
+		FormThread->Start();//inicializamos este thread ya que solo es para actualizar lo que se ve en pantalla
+		
+	}
+
+			 //Host Button
+	private: System::Void button10_Click(System::Object^  sender, System::EventArgs^  e)
+	{
+		try
+		{
+			label1->Text = "Creating Server...";
+			_Socket = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
+			_Socket->Bind(gcnew IPEndPoint(0, 5000));
+			_Socket->Listen(0);
+			Cliente = _Socket->Accept();
+			if (Cliente != nullptr)
 			{
+				label1->Text = "MatchCreated";
+				IsServer = true;
+				player = 'X';
+				GameReady = true;
+				//Recive the message
+
+				//Esperamos a que llegue un mensaje de prueba
+				if (Cliente->Available > 0)
+				{
+
+					array<Byte> ^data = gcnew array<Byte>(1);
+					int bytesS = Cliente->Receive(data, 1, SocketFlags::None);
+					label6->Text = bytesS.ToString();
+					if (data[0] == 43)
+						label1->Text = "Host";
+
+					NetworkThread->Start();
+				}
+
+				button10->Enabled = false;
+				button11->Enabled = false;
+
+
+			}
+		}
+		catch (System::Net::Sockets::SocketException^ error)
+		{
+			label1->Text = String::Concat("Error:", error->ToString());
+		}
+	}
+			 //Conect button
+	private: System::Void button11_Click(System::Object^  sender, System::EventArgs^  e)
+	{
+		try
+		{
+			Cliente = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
+			Cliente->Connect(gcnew IPEndPoint(IPAddress::Parse("127.0.0.1"), 5000));
+			if (Cliente->IsBound)
+			{
+				label1->Text = String::Concat("Conected to:", Cliente->RemoteEndPoint->ToString());
+				GameReady = true;
+				player = 'O';
+				//mandamos un mensaje
 				array<Byte> ^data = gcnew array<Byte>(1);
-				int bytesS = Cliente->Receive(data, 1, SocketFlags::None);
-				label6->Text = bytesS.ToString();
-				if (data[0] == 43)
-					label1->Text = "Host";
-			}
-			
-			button10->Enabled = false;
-			button11->Enabled = false;
-			
+				data[0] = 43;//Initial Network Code
+				int bytesS = Cliente->Send(data, 1, SocketFlags::None);
 
+				if (bytesS > 0)
+				{
+					label1->Text = "Client";
+				}
+				NetworkThread->Start();
+				label5->Text = bytesS.ToString();
+				button10->Enabled = false;
+				button11->Enabled = false;
+			}
+		}
+		catch (System::Net::Sockets::SocketException^ error)
+		{
+			label1->Text = String::Concat("Error:", error->ToString());
 		}
 	}
-	catch(System::Net::Sockets::SocketException^ error)
+
+	//TODO, EL CODIGO AQUI REPRESENTA LA MISMA FUNCIONALIDAD EN CADA BOTON PERO CON DIFERENTE INDICE EN TABLERO
+	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-		label1->Text = String::Concat("Error:", error->ToString());
-	}
-}
-//Conect button
-private: System::Void button11_Click(System::Object^  sender, System::EventArgs^  e)
-{
-	try 
-	{
-		Cliente = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
-		Cliente->Connect(gcnew IPEndPoint(IPAddress::Parse("127.0.0.1"), 5000));
-		if (Cliente->IsBound) 
+		if (GameReady)
 		{
-			label1->Text = String::Concat("Conected to:", Cliente->RemoteEndPoint->ToString());
-			GameReady = true;
-			player = 'O';
-			//mandamos un mensaje
-			array<Byte> ^data = gcnew array<Byte>(1);
-			data[0] = 43;//Initial Network Code
-			int bytesS = Cliente->Send(data, 1, SocketFlags::None);
-			if (bytesS > 0)
+			if (Tablero[0] == 0)
 			{
-				label1->Text = "Client";
-				HoldForData();
-			}
-			
-			label5->Text = bytesS.ToString();
-			button10->Enabled = false;
-			button11->Enabled = false;
-		}
-	}
-	catch (System::Net::Sockets::SocketException^ error)
-	{
-		label1->Text = String::Concat("Error:", error->ToString());
-	}
-}
-
-//TODO, EL CODIGO AQUI REPRESENTA LA MISMA FUNCIONALIDAD EN CADA BOTON PERO CON DIFERENTE INDICE EN TABLERO
-private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	if(GameReady)
-	{
-		if (Tablero[0] == 0)
-		{
-			Tablero[0] = player;
-			UpdateForms();
-			Send();
-			HoldForData();
-
-		
-		}
-	}
-}
-private: System::Void button6_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	if (GameReady)
-	{
-		if (Tablero[1] == 0)
-		{
-			Tablero[1] = player;
-			UpdateForms();
-			Send();
-		
-			HoldForData();
-			
-			
-				
+				Tablero[0] = player;
+				Send();
 			}
 		}
 	}
-}
-private: System::Void button9_Click(System::Object^  sender, System::EventArgs^  e)
-{
-	if (GameReady)
+	private: System::Void button6_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-		if (Tablero[2] == 0)
+		if (GameReady)
 		{
-			
-			Tablero[2] = player;
-		
-			Send();
-			UpdateForms();
-			HoldForData();
-		}
-		
-	}
-}
-private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	if (GameReady)
-	{
-		if (Tablero[3] == 0 )
-		{
-			
-			Tablero[3] = player;
-			
-			Send();
-			UpdateForms();
-			HoldForData();
-			
+			if (Tablero[1] == 0)
+			{
+				Tablero[1] = player;
+				Send();
+			}
 		}
 	}
-}
-private: System::Void button5_Click(System::Object^  sender, System::EventArgs^  e)
-{
-	if (GameReady)
+	private: System::Void button9_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-		if (Tablero[4] == 0)
+		if (GameReady)
 		{
-			Tablero[4] = player;
-			
-			Send();
-			UpdateForms();
-			HoldForData();
-	
-		
-		}
-	}
-}
-private: System::Void button8_Click(System::Object^  sender, System::EventArgs^  e)
-{
-	if (GameReady)
-	{
-		if (Tablero[5] == 0) 
-		{
-			Tablero[5] = player;
-			
-			Send();
-			UpdateForms();
-			HoldForData();
+			if (Tablero[2] == 0)
+			{
+				Tablero[2] = player;
+				Send();
+			}
 
-			
 		}
 	}
-}
-private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) 
-{
-	if (GameReady)
+	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-		if (Tablero[6] == 0) 
+		if (GameReady)
 		{
-			Tablero[6] = player;
-		
-			Send();
-			UpdateForms();
-			HoldForData();
+			if (Tablero[3] == 0)
+			{
+				Tablero[3] = player;
+				Send();
+			}
 		}
-		
 	}
-}
+	private: System::Void button5_Click(System::Object^  sender, System::EventArgs^  e)
+	{
+		if (GameReady)
+		{
+			if (Tablero[4] == 0)
+			{
+				Tablero[4] = player;
+				Send();
+			}
+		}
+	}
+	private: System::Void button8_Click(System::Object^  sender, System::EventArgs^  e)
+	{
+		if (GameReady)
+		{
+			if (Tablero[5] == 0)
+			{
+				Tablero[5] = player;
+				Send();
+			}
+		}
+	}
+	private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e)
+	{
+		if (GameReady)
+		{
+			if (Tablero[6] == 0)
+			{
+				Tablero[6] = player;
+				Send();
+			}
+		}
+	}
 	private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e)
-		 {
-			 if (GameReady)
-			 {
-				 if (Tablero[7] == 0)
-				 {
-					 Tablero[7] = player;
-					 
-					 Send();
-					 UpdateForms();
-					 HoldForData();
-				
-				 }
-
-			 }
-		 }
-
-			 private: System::Void button7_Click(System::Object^  sender, System::EventArgs^  e)
-			 {
-				 if (GameReady)
-				 {
-					 if (Tablero[8] == 0)
-					 {
-						 Tablero[8] = player;
-						
-						 Send();
-						 UpdateForms();
-						 HoldForData();
-					 }
-
-				 }
-			 }
-
-
-private: System::Void button13_Click(System::Object^  sender, System::EventArgs^  e) 
 	{
-	this->Close();
+		if (GameReady)
+		{
+			if (Tablero[7] == 0)
+			{
+				Tablero[7] = player;
+				Send();
+			}
+		}
 	}
+	private: System::Void button7_Click(System::Object^  sender, System::EventArgs^  e)
+	{
+		if (GameReady)
+		{
+			if (Tablero[8] == 0)
+			{
+				Tablero[8] = player;
+				Send();
+			}
+		}
+	}
+   //exit button
+    private: System::Void button13_Click(System::Object^  sender, System::EventArgs^  e)
+	{
+	
 
-private: System::Void button12_Click(System::Object^  sender, System::EventArgs^  e)
-{
-	ResetGame();
-	UpdateForms();
-	button10->Enabled = true;
-	button11->Enabled = true;
-	if (IsServer)
-	{
-		_Socket->Close();//Cerramos el socket principal
-		label1->Text = "Server Disconected";
+		this->Close();
 	}
-	else
+	//Disconnect
+	private: System::Void button12_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-		Cliente->Close();
-		label1->Text = "Client Disconected";
-	}
-}
+		ResetGame();
+		UpdateForms();
+		button10->Enabled = true;
+		button11->Enabled = true;
+		if (IsServer)
+		{
+			_Socket->Close();//Cerramos el socket principal
+			label1->Text = "Server Disconected";
+		}
+		else
+		{
+			Cliente->Close();
+			label1->Text = "Client Disconected";
+		}
+	  }
+	
+
 };
+}
