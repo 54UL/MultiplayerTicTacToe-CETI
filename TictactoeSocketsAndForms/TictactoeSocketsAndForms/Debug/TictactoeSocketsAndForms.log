@@ -1,3 +1,0 @@
-﻿  MenuPrincipal.cpp
-MenuPrincipal.cpp(8): warning C4829: Parámetros posiblemente incorrectos para la función main. Utilice 'int main(Platform::Array<Platform::String^>^ argv)'
-  TictactoeSocketsAndForms.vcxproj -> C:\Users\sal\Desktop\MultiplayerTicTacToe-CETI\TictactoeSocketsAndForms\Debug\TictactoeSocketsAndForms.exe
