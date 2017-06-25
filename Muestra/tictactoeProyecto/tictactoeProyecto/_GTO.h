@@ -80,7 +80,6 @@ namespace tictactoeProyecto
 					int BytesRecived = Cliente->Receive(Tablero, 9, SocketFlags::None);
 					int BytesRecived2 = Cliente->Receive(ExtraData, 4, SocketFlags::None);
 					label6->Text = String::Concat("bytes recividos:", (BytesRecived + BytesRecived2).ToString());
-
 				}
 			}
 			catch (SocketException ^e) 
@@ -89,7 +88,7 @@ namespace tictactoeProyecto
 			}
 		}
 
-		void HoldForData()
+		void HoldForData()// network thread func
 		{
 			try
 			{
@@ -104,7 +103,7 @@ namespace tictactoeProyecto
 			}
 		}
 
-		void UpdateForms(void) //thread func1
+		void UpdateForms(void) //Forms thread func
 		{
 			
 			
@@ -125,6 +124,7 @@ namespace tictactoeProyecto
 			while (FormThread->IsAlive)
 			{
 				Thread::Sleep(60);
+
 				//aprovechamos este loop para preguntar de quien es turno 
 			    if (IsServer) 
 				{
@@ -140,8 +140,18 @@ namespace tictactoeProyecto
 					else
 						GameReady = false;
 				}
-			    
 
+
+			    //y tambien para ver quien gano *emoticono de la luna negra*
+				CheckWinner();
+			/*	// yyyy tambien preguntamos el byte de status haber que hacer respecto
+				if (ExtraData[3] == 1) // request reset
+				{
+					ResetGame();
+					ExtraData[3] = 0;
+					Send();
+				}
+				*/
 				//Labels 
 				label2->Text = String::Concat("Jugador1 pts: ", ExtraData[1].ToString());
 				label3->Text = String::Concat("Jugador2 pts : ", ExtraData[2].ToString());
@@ -202,12 +212,44 @@ namespace tictactoeProyecto
 		
 		void CheckWinner()
 		{
-		
+			if (IsServer) 
+			{
+				if (CheckBoardFor('X')) 
+				{
+				    //Gano x
+					ExtraData[1]++;
+					ResetGame();
+					Send();
+					MessageBox::Show("X ha ganado <3");
+					
+				}
+			}
+			else if(ExtraData[0]>=9) //comprobamos primero que no sea turno 9
+			{
+				//Empate
+				ResetGame();
+				Send();
+				MessageBox::Show("Nadie ha ganado 7u7");
+				
+			}
+			else 
+			{
+				if (CheckBoardFor('O'))
+				{
+					//gano 
+					ExtraData[2]++;
+					ResetGame();
+					Send();
+					MessageBox::Show("O ha ganado");
+					
+					
+				}
+			}
+
 		}
 		void ResetGame()
 		{
-			NetworkThread->Abort();
-		
+			ExtraData[0] = 0;// regresamos los turnos a 0 
 			for (int i = 0; i < 9; i++)
 			{
 				Tablero[i] = 0;
