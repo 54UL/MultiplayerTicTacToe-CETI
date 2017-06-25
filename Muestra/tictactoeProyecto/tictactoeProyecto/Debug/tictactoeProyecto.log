@@ -1,4 +1,3 @@
 ﻿  _GTO.cpp
 _GTO.cpp(8): warning C4829: Parámetros posiblemente incorrectos para la función main. Utilice 'int main(Platform::Array<Platform::String^>^ argv)'
-c:\users\sal\desktop\multiplayertictactoe-ceti\muestra\tictactoeproyecto\tictactoeproyecto\_gto.h(176): warning C4715: 'tictactoeProyecto::_GTO::CheckBoardFor': no todas las rutas de acceso de control devuelven un valor
   tictactoeProyecto.vcxproj -> C:\Users\sal\Desktop\MultiplayerTicTacToe-CETI\Muestra\tictactoeProyecto\Debug\tictactoeProyecto.exe

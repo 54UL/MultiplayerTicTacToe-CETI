@@ -72,13 +72,20 @@ namespace tictactoeProyecto
 
 		void ReciveGameData()
 		{
-			if (Cliente->Available > 0)
+			try 
 			{
-				//FirstPartOfTheTransmission...
-				int BytesRecived = Cliente->Receive(Tablero, 9, SocketFlags::None);
-				int BytesRecived2 = Cliente->Receive(ExtraData, 4, SocketFlags::None);
-				label6->Text = String::Concat("bytes recividos:", (BytesRecived+BytesRecived2).ToString());
-				
+				if (Cliente->Available > 0)
+				{
+					//FirstPartOfTheTransmission...
+					int BytesRecived = Cliente->Receive(Tablero, 9, SocketFlags::None);
+					int BytesRecived2 = Cliente->Receive(ExtraData, 4, SocketFlags::None);
+					label6->Text = String::Concat("bytes recividos:", (BytesRecived + BytesRecived2).ToString());
+
+				}
+			}
+			catch (SocketException ^e) 
+			{
+				label1->Text = e->Message->ToString();
 			}
 		}
 
@@ -93,7 +100,7 @@ namespace tictactoeProyecto
 			}
 			catch (SocketException ^e)
 			{
-				label1->Text = e->SocketErrorCode.ToString();
+				label1->Text = e->Message->ToString();
 			}
 		}
 
@@ -113,17 +120,33 @@ namespace tictactoeProyecto
 			Monitor::Enter(button7);
 			Monitor::Enter(button8);
 			Monitor::Enter(button9);
-			
-
+		
 			
 			while (FormThread->IsAlive)
 			{
 				Thread::Sleep(60);
+				//aprovechamos este loop para preguntar de quien es turno 
+			    if (IsServer) 
+				{
+					if (ExtraData[0] % 2 == 0)
+						GameReady = true;
+					else
+						GameReady = false;
+			    }
+				else
+				{
+					if (ExtraData[0] % 2 != 0)
+						GameReady = true;
+					else
+						GameReady = false;
+				}
+			    
+
 				//Labels 
 				label2->Text = String::Concat("Jugador1 pts: ", ExtraData[1].ToString());
 				label3->Text = String::Concat("Jugador2 pts : ", ExtraData[2].ToString());
 				label4->Text = String::Concat("Turn: ", ExtraData[0].ToString());
-				//ARRAY TO GRAPHICAL TEXT;
+				//ARRAY TO GRAPHICAL button->Text
 				button1->Text = Convert::ToChar(Tablero[0]).ToString();
 				button6->Text = Convert::ToChar(Tablero[1]).ToString();
 				button9->Text = Convert::ToChar(Tablero[2]).ToString();
@@ -134,6 +157,7 @@ namespace tictactoeProyecto
 				button4->Text = Convert::ToChar(Tablero[7]).ToString();
 				button7->Text = Convert::ToChar(Tablero[8]).ToString();
 			}
+
 			Monitor::Exit(ExtraData);
 			Monitor::Exit(label2);
 			Monitor::Exit(label3);
@@ -149,7 +173,6 @@ namespace tictactoeProyecto
 			
 		}
 
-		//Empanada xD checa esto
 		bool CheckBoardFor(char PlayerToken) 
 		{
 		    //horizontal
@@ -177,9 +200,14 @@ namespace tictactoeProyecto
 				return 0;
 		}
 		
+		void CheckWinner()
+		{
+		
+		}
 		void ResetGame()
 		{
 			NetworkThread->Abort();
+		
 			for (int i = 0; i < 9; i++)
 			{
 				Tablero[i] = 0;
@@ -477,13 +505,11 @@ namespace tictactoeProyecto
 	{
 		CheckForIllegalCrossThreadCalls = false; //alv usamos esta madre pa que funcione
 		FormThread = gcnew Thread(gcnew ThreadStart(this,&_GTO::UpdateForms)); //Initialize the form updater thread
-
 	    NetworkThread  = gcnew Thread(gcnew ThreadStart(this, &_GTO::HoldForData)); //Initialize the NetworkThread
 		FormThread->Start();//inicializamos este thread ya que solo es para actualizar lo que se ve en pantalla
-		
 	}
 
-			 //Host Button
+	//Host Button
 	private: System::Void button10_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		try
@@ -509,7 +535,7 @@ namespace tictactoeProyecto
 					int bytesS = Cliente->Receive(data, 1, SocketFlags::None);
 					label6->Text = bytesS.ToString();
 					if (data[0] == 43)
-						label1->Text = "Host";
+					label1->Text = "Host";
 
 					NetworkThread->Start();
 				}
@@ -531,7 +557,7 @@ namespace tictactoeProyecto
 		try
 		{
 			Cliente = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
-			Cliente->Connect(gcnew IPEndPoint(IPAddress::Parse("127.0.0.1"), 5000));
+			Cliente->Connect(gcnew IPEndPoint(IPAddress::Parse("127.0.0.1"), 5000)); //TODO: cambiar esto por el campo de un textbox para la ip
 			if (Cliente->IsBound)
 			{
 				label1->Text = String::Concat("Conected to:", Cliente->RemoteEndPoint->ToString());
@@ -558,7 +584,7 @@ namespace tictactoeProyecto
 		}
 	}
 
-	//TODO, EL CODIGO AQUI REPRESENTA LA MISMA FUNCIONALIDAD EN CADA BOTON PERO CON DIFERENTE INDICE EN TABLERO
+	// EL CODIGO AQUI REPRESENTA LA MISMA FUNCIONALIDAD EN CADA BOTON PERO CON DIFERENTE INDICE EN TABLERO(botones)
 	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -566,7 +592,9 @@ namespace tictactoeProyecto
 			if (Tablero[0] == 0)
 			{
 				Tablero[0] = player;
+				ExtraData[0]++;
 				Send();
+
 			}
 		}
 	}
@@ -577,6 +605,7 @@ namespace tictactoeProyecto
 			if (Tablero[1] == 0)
 			{
 				Tablero[1] = player;
+				ExtraData[0]++;
 				Send();
 			}
 		}
@@ -588,6 +617,7 @@ namespace tictactoeProyecto
 			if (Tablero[2] == 0)
 			{
 				Tablero[2] = player;
+				ExtraData[0]++;
 				Send();
 			}
 
@@ -600,6 +630,7 @@ namespace tictactoeProyecto
 			if (Tablero[3] == 0)
 			{
 				Tablero[3] = player;
+				ExtraData[0]++;
 				Send();
 			}
 		}
@@ -611,6 +642,7 @@ namespace tictactoeProyecto
 			if (Tablero[4] == 0)
 			{
 				Tablero[4] = player;
+				ExtraData[0]++;
 				Send();
 			}
 		}
@@ -622,6 +654,7 @@ namespace tictactoeProyecto
 			if (Tablero[5] == 0)
 			{
 				Tablero[5] = player;
+				ExtraData[0]++;
 				Send();
 			}
 		}
@@ -633,6 +666,7 @@ namespace tictactoeProyecto
 			if (Tablero[6] == 0)
 			{
 				Tablero[6] = player;
+				ExtraData[0]++;
 				Send();
 			}
 		}
@@ -644,6 +678,7 @@ namespace tictactoeProyecto
 			if (Tablero[7] == 0)
 			{
 				Tablero[7] = player;
+				ExtraData[0]++;
 				Send();
 			}
 		}
@@ -655,6 +690,7 @@ namespace tictactoeProyecto
 			if (Tablero[8] == 0)
 			{
 				Tablero[8] = player;
+				ExtraData[0]++;
 				Send();
 			}
 		}
@@ -664,25 +700,23 @@ namespace tictactoeProyecto
 	{
 		this->Close();
 	}
-	//Disconnect
+	//Disconnect button
 	private: System::Void button12_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-		ResetGame();
-		UpdateForms();
-		button10->Enabled = true;
-		button11->Enabled = true;
 		if (IsServer)
 		{
-			_Socket->Close();//Cerramos el socket principal
-			label1->Text = "Server Disconected";
+			_Socket->Close();//cerramos el listener para conexiones entrantes
+			Cliente->Close();//Cerramos el socket principal
+			//label1->Text = "Server Disconected...";
 		}
 		else
 		{
-			Cliente->Close();
-			label1->Text = "Client Disconected";
+			Cliente->Close();//Cerramos el socket principal
+			//label1->Text = "Client Disconected...";
 		}
-	  }
-	
-
+		ResetGame();
+		button10->Enabled = true;
+		button11->Enabled = true;
+	}
 };
 }

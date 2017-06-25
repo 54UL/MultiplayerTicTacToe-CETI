@@ -23,4 +23,5 @@ Class tictactoeProyecto._GTO: AutoLayout, AnsiClass, Class, Public, BeforeFieldI
     HoldForData(): PrivateScope, Public, HideBySig
     UpdateForms(): PrivateScope, Public, HideBySig
     CheckBoardFor(SByte IsSignUnspecifiedByte): PrivateScope, Public, HideBySig
+    CheckWinner(): PrivateScope, Public, HideBySig
     ResetGame(): PrivateScope, Public, HideBySig
