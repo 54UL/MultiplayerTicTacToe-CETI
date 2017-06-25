@@ -155,24 +155,26 @@ namespace tictactoeProyecto
 		    //horizontal
 			if (Tablero[0] == PlayerToken && Tablero[1] == PlayerToken && Tablero[2] == PlayerToken)
 				return true;
-			
 			else if (Tablero[3] == PlayerToken && Tablero[4] == PlayerToken && Tablero[5] == PlayerToken)
 				return true;
-
- 			else if (Tablero[6] == PlayerToken && Tablero[7] == PlayerToken && Tablero[8] == PlayerToken)
+			else if (Tablero[6] == PlayerToken && Tablero[7] == PlayerToken && Tablero[8] == PlayerToken)
 				return true;
-		    //vertical
-			if (Tablero[0] == PlayerToken && Tablero[3] == PlayerToken && Tablero[6] == PlayerToken)
+			//vertical
+			else if (Tablero[0] == PlayerToken && Tablero[3] == PlayerToken && Tablero[6] == PlayerToken)
 				return true;
 
 			else if (Tablero[1] == PlayerToken && Tablero[4] == PlayerToken && Tablero[7] == PlayerToken)
 				return true;
-
 			else if (Tablero[2] == PlayerToken && Tablero[5] == PlayerToken && Tablero[8] == PlayerToken)
 				return true;
 			//Diagonal IZQ
-			//Diagnal  Der
-
+			else if (Tablero[6] == PlayerToken && Tablero[4] == PlayerToken && Tablero[2] == PlayerToken)
+				return true;
+			//Diagonal Derecha
+			else if (Tablero[0] == PlayerToken && Tablero[4] == PlayerToken && Tablero[8] == PlayerToken)
+				return true;
+			else
+				return 0;
 		}
 		
 		void ResetGame()
