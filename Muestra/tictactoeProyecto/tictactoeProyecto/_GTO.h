@@ -30,8 +30,9 @@ namespace tictactoeProyecto
 		Thread ^ FormThread,^NetworkThread;
 
 		bool GameReady = false;
-		
-		array<Byte> ^ Tablero;
+	   volatile bool NetworkReady = true;// variable que controla el bucle del thread
+	   volatile bool FormsReady=true;   
+		array<Byte> ^ Tablero; 
 		array<Byte> ^ ExtraData;
 
 
@@ -96,21 +97,32 @@ namespace tictactoeProyecto
 		{
 			try
 			{
-				while (NetworkThread->IsAlive)
+				while (NetworkReady)
 				{
 					ReciveGameData();
+
+					//preguntamos quien es turno
+					//y tambien para ver quien gano *emoticono de la luna negra*
+					CheckWinner();
+					// yyyy tambien preguntamos el byte de status haber que hacer respecto
+					if (ExtraData[3] == 1) //Some one did a rage quit
+					{
+						MessageBox::Show("Tu Adversario ha abandonado la partida :(");
+						CleanUp();
+						ExtraData[3] = 0;
+					}
 				}
 			}
 			catch (SocketException ^e)
 			{
+				NetworkReady = false;
 				label1->Text = e->Message->ToString();
 			}
 		}
 
 		void UpdateForms(void) //Forms thread func
 		{
-			
-			
+
 			Monitor::Enter(ExtraData);
 			Monitor::Enter(label2);
 			Monitor::Enter(label3);
@@ -129,6 +141,7 @@ namespace tictactoeProyecto
 			{
 				Thread::Sleep(60);
 
+
 				//aprovechamos este loop para preguntar de quien es turno 
 			    if (IsServer) 
 				{
@@ -146,20 +159,12 @@ namespace tictactoeProyecto
 				}
 
 
-			    //y tambien para ver quien gano *emoticono de la luna negra*
-				CheckWinner();
-				// yyyy tambien preguntamos el byte de status haber que hacer respecto
-				if (ExtraData[3] == 1) //Some one did a rage quit
-				{
-					MessageBox::Show("Tu Adversario ha abandonado la partida :(");
-					CleanUp();
-					ExtraData[3] = 0;
-				}
+			   
 				
 				//Labels 
 				label2->Text = String::Concat("Jugador1 pts: ", ExtraData[1].ToString());
 				label3->Text = String::Concat("Jugador2 pts : ", ExtraData[2].ToString());
-				label4->Text = String::Concat("Turn: ", ExtraData[0].ToString());
+				label4->Text = String::Concat("Turn: ",    ExtraData[0] % 2 == 0 ? "X":"O");
 				//ARRAY TO GRAPHICAL button->Text
 				button1->Text = Convert::ToChar(Tablero[0]).ToString();
 				button6->Text = Convert::ToChar(Tablero[1]).ToString();
@@ -259,6 +264,7 @@ namespace tictactoeProyecto
 
 		void CleanUp() 
 		{
+			
 			if (IsServer)
 			{
 				_Socket->Close();//cerramos el listener para conexiones entrantes
@@ -270,6 +276,7 @@ namespace tictactoeProyecto
 				Cliente->Close();//Cerramos el socket principal
 								 //label1->Text = "Client Disconected...";
 			}
+			
 			ResetGame();
 			ExtraData[1] = 0;
 			ExtraData[2] = 0;
@@ -597,7 +604,7 @@ namespace tictactoeProyecto
 					int bytesS = Cliente->Receive(data, 1, SocketFlags::None);
 					label6->Text = bytesS.ToString();
 					if (data[0] == 43)
-					label1->Text = "Host";
+					label1->Text = "Eres X";
 
 					NetworkThread->Start();
 				}
@@ -632,7 +639,7 @@ namespace tictactoeProyecto
 
 				if (bytesS > 0)
 				{
-					label1->Text = "Client";
+					label1->Text = "Eres O";
 				}
 				NetworkThread->Start();
 				label5->Text = bytesS.ToString();
@@ -660,6 +667,7 @@ namespace tictactoeProyecto
 			}
 		}
 	}
+
 	private: System::Void button6_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -672,6 +680,7 @@ namespace tictactoeProyecto
 			}
 		}
 	}
+
 	private: System::Void button9_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -685,6 +694,7 @@ namespace tictactoeProyecto
 
 		}
 	}
+
 	private: System::Void button2_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -697,6 +707,7 @@ namespace tictactoeProyecto
 			}
 		}
 	}
+
 	private: System::Void button5_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -709,6 +720,7 @@ namespace tictactoeProyecto
 			}
 		}
 	}
+
 	private: System::Void button8_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -721,6 +733,7 @@ namespace tictactoeProyecto
 			}
 		}
 	}
+
 	private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -733,6 +746,7 @@ namespace tictactoeProyecto
 			}
 		}
 	}
+
 	private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -745,6 +759,7 @@ namespace tictactoeProyecto
 			}
 		}
 	}
+
 	private: System::Void button7_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		if (GameReady)
@@ -757,17 +772,20 @@ namespace tictactoeProyecto
 			}
 		}
 	}
+
    //exit button
     private: System::Void button13_Click(System::Object^  sender, System::EventArgs^  e)
 	{
 		ExtraData[3] = 1;
 		Send();
-
 		this->Close();
 	}
+
+
 	//Disconnect button
 	private: System::Void button12_Click(System::Object^  sender, System::EventArgs^  e)
 	{
+		NetworkReady = false;
 		ExtraData[3] = 1;
 		Send();
 		CleanUp();
