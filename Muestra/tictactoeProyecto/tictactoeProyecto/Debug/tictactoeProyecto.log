@@ -1,3 +1,8 @@
 ﻿  _GTO.cpp
+c:\users\sal\documents\github\multiplayertictactoe-ceti\muestra\tictactoeproyecto\tictactoeproyecto\_GTO.h(125): warning C4101: 'e': variable local sin referencia
+c:\users\sal\documents\github\multiplayertictactoe-ceti\muestra\tictactoeproyecto\tictactoeproyecto\_GTO.h(142): warning C4101: 'e': variable local sin referencia
+c:\users\sal\documents\github\multiplayertictactoe-ceti\muestra\tictactoeproyecto\tictactoeproyecto\_GTO.h(170): warning C4101: 'e': variable local sin referencia
+c:\users\sal\documents\github\multiplayertictactoe-ceti\muestra\tictactoeproyecto\tictactoeproyecto\_GTO.h(851): warning C4101: 'error': variable local sin referencia
+c:\users\sal\documents\github\multiplayertictactoe-ceti\muestra\tictactoeproyecto\tictactoeproyecto\_GTO.h(898): warning C4101: 'error': variable local sin referencia
 _GTO.cpp(8): warning C4829: Parámetros posiblemente incorrectos para la función main. Utilice 'int main(Platform::Array<Platform::String^>^ argv)'
-LINK : fatal error LNK1104: no se puede abrir el archivo 'C:\Users\sal\Desktop\MultiplayerTicTacToe-CETI\Muestra\tictactoeProyecto\Debug\tictactoeProyecto.exe'
+  tictactoeProyecto.vcxproj -> C:\Users\sal\Documents\GitHub\MultiplayerTicTacToe-CETI\Muestra\tictactoeProyecto\Debug\tictactoeProyecto.exe
