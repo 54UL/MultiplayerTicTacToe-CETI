@@ -25,3 +25,4 @@ Class tictactoeProyecto._GTO: AutoLayout, AnsiClass, Class, Public, BeforeFieldI
     CheckBoardFor(SByte IsSignUnspecifiedByte): PrivateScope, Public, HideBySig
     CheckWinner(): PrivateScope, Public, HideBySig
     ResetGame(): PrivateScope, Public, HideBySig
+    CleanUp(): PrivateScope, Public, HideBySig

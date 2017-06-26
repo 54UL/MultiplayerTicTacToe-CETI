@@ -30,6 +30,7 @@ namespace tictactoeProyecto
 		Thread ^ FormThread,^NetworkThread;
 
 		bool GameReady = false;
+		
 		array<Byte> ^ Tablero;
 		array<Byte> ^ ExtraData;
 
@@ -85,6 +86,9 @@ namespace tictactoeProyecto
 			catch (SocketException ^e) 
 			{
 				label1->Text = e->Message->ToString();
+				MessageBox::Show("Connection lost");
+				CleanUp();
+				
 			}
 		}
 
@@ -144,14 +148,14 @@ namespace tictactoeProyecto
 
 			    //y tambien para ver quien gano *emoticono de la luna negra*
 				CheckWinner();
-			/*	// yyyy tambien preguntamos el byte de status haber que hacer respecto
-				if (ExtraData[3] == 1) // request reset
+				// yyyy tambien preguntamos el byte de status haber que hacer respecto
+				if (ExtraData[3] == 1) //Some one did a rage quit
 				{
-					ResetGame();
+					MessageBox::Show("Tu Adversario ha abandonado la partida :(");
+					CleanUp();
 					ExtraData[3] = 0;
-					Send();
 				}
-				*/
+				
 				//Labels 
 				label2->Text = String::Concat("Jugador1 pts: ", ExtraData[1].ToString());
 				label3->Text = String::Concat("Jugador2 pts : ", ExtraData[2].ToString());
@@ -230,7 +234,6 @@ namespace tictactoeProyecto
 				ResetGame();
 				Send();
 				MessageBox::Show("Nadie ha ganado 7u7");
-				
 			}
 			else 
 			{
@@ -241,8 +244,6 @@ namespace tictactoeProyecto
 					ResetGame();
 					Send();
 					MessageBox::Show("O ha ganado");
-					
-					
 				}
 			}
 
@@ -256,6 +257,25 @@ namespace tictactoeProyecto
 			}
 		}
 
+		void CleanUp() 
+		{
+			if (IsServer)
+			{
+				_Socket->Close();//cerramos el listener para conexiones entrantes
+				Cliente->Close();//Cerramos el socket principal
+								 //label1->Text = "Server Disconected...";
+			}
+			else
+			{
+				Cliente->Close();//Cerramos el socket principal
+								 //label1->Text = "Client Disconected...";
+			}
+			ResetGame();
+			ExtraData[1] = 0;
+			ExtraData[2] = 0;
+			button10->Enabled = true;
+			button11->Enabled = true;
+		}
 	
 
 
@@ -740,25 +760,17 @@ namespace tictactoeProyecto
    //exit button
     private: System::Void button13_Click(System::Object^  sender, System::EventArgs^  e)
 	{
+		ExtraData[3] = 1;
+		Send();
+
 		this->Close();
 	}
 	//Disconnect button
 	private: System::Void button12_Click(System::Object^  sender, System::EventArgs^  e)
 	{
-		if (IsServer)
-		{
-			_Socket->Close();//cerramos el listener para conexiones entrantes
-			Cliente->Close();//Cerramos el socket principal
-			//label1->Text = "Server Disconected...";
-		}
-		else
-		{
-			Cliente->Close();//Cerramos el socket principal
-			//label1->Text = "Client Disconected...";
-		}
-		ResetGame();
-		button10->Enabled = true;
-		button11->Enabled = true;
+		ExtraData[3] = 1;
+		Send();
+		CleanUp();
 	}
 };
 }
