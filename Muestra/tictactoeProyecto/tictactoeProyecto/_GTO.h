@@ -44,9 +44,15 @@ namespace tictactoeProyecto
 		
 
 	private: System::Windows::Forms::Button^  button12;
-	private: System::Windows::Forms::Label^  label5;
-	private: System::Windows::Forms::Label^  label6;
-    private: System::Windows::Forms::Label^  label4;
+
+
+	private: System::Windows::Forms::TextBox^  textBox1;
+	private: System::Windows::Forms::TextBox^  textBox2;
+	private: System::Windows::Forms::TextBox^  textBox3;
+	private: System::Windows::Forms::Button^  button14;
+
+	private: System::Windows::Forms::ContextMenuStrip^  contextMenuStrip1;
+
 
 	public:
 
@@ -58,6 +64,43 @@ namespace tictactoeProyecto
 			//Initialze the network data
 			Tablero = gcnew array<unsigned char>(9);
 			ExtraData = gcnew array<unsigned char>(4);
+			button1->Hide();
+			button2->Hide();
+			button3->Hide();
+			button4->Hide();
+			button5->Hide();
+			button6->Hide();
+			button7->Hide();
+			button8->Hide();
+			button9->Hide();
+			button12->Hide();
+			textBox1->Hide();
+			textBox2->Hide();
+			textBox3->Hide();
+			label2->Hide();
+			label3->Hide();
+
+			button1->BackColor = Color::White;
+			button1->ForeColor = Color::Black;
+			button2->BackColor = Color::White;
+			button2->ForeColor = Color::Black;
+			button3->BackColor = Color::White;
+			button3->ForeColor = Color::Black;
+			button4->BackColor = Color::White;
+			button4->ForeColor = Color::Black;
+			button5->BackColor = Color::White;
+			button5->ForeColor = Color::Black;
+			button6->BackColor = Color::White;
+			button6->ForeColor = Color::Black;
+			button7->BackColor = Color::White;
+			button7->ForeColor = Color::Black;
+			button8->BackColor = Color::White;
+			button8->ForeColor = Color::Black;
+			button9->BackColor = Color::White;
+			button9->ForeColor = Color::Black;
+
+
+
 		}
 		//variables 
 		//app functions
@@ -69,7 +112,6 @@ namespace tictactoeProyecto
 			//TO DO: AÑADIR EXCEPCIONES
 			int BytesSended = Cliente->Send(Tablero, 9, SocketFlags::None);
 			int ByteS2 = Cliente->Send(ExtraData, 4, SocketFlags::None);
-			label5->Text = String::Concat("Bytes enviados:", (BytesSended + ByteS2).ToString());
 		}
 
 		void ReciveGameData()
@@ -81,13 +123,11 @@ namespace tictactoeProyecto
 					//FirstPartOfTheTransmission...
 					int BytesRecived = Cliente->Receive(Tablero, 9, SocketFlags::None);
 					int BytesRecived2 = Cliente->Receive(ExtraData, 4, SocketFlags::None);
-					label6->Text = String::Concat("bytes recividos:", (BytesRecived + BytesRecived2).ToString());
 				}
 			}
 			catch (SocketException ^e) 
 			{
-				label1->Text = e->Message->ToString();
-				MessageBox::Show("Connection lost");
+				MessageBox::Show("Conexión perdida");
 				CleanUp();
 				
 			}
@@ -116,7 +156,7 @@ namespace tictactoeProyecto
 			catch (SocketException ^e)
 			{
 				NetworkReady = false;
-				label1->Text = e->Message->ToString();
+				MessageBox::Show("Error");
 			}
 		}
 
@@ -126,7 +166,8 @@ namespace tictactoeProyecto
 			Monitor::Enter(ExtraData);
 			Monitor::Enter(label2);
 			Monitor::Enter(label3);
-			Monitor::Enter(label4);
+			Monitor::Enter(textBox1);
+			Monitor::Enter(textBox2);
 			Monitor::Enter(button1);
 			Monitor::Enter(button3);
 			Monitor::Enter(button4);
@@ -162,9 +203,10 @@ namespace tictactoeProyecto
 			   
 				
 				//Labels 
-				label2->Text = String::Concat("Jugador1 pts: ", ExtraData[1].ToString());
-				label3->Text = String::Concat("Jugador2 pts : ", ExtraData[2].ToString());
-				label4->Text = String::Concat("Turn: ",    ExtraData[0] % 2 == 0 ? "X":"O");
+				label2->Text = String::Concat("Ganadas J1 X: ", ExtraData[1].ToString());
+				label3->Text = String::Concat("Ganadas J2 O: ", ExtraData[2].ToString());
+				textBox1->BackColor = (ExtraData[0] % 2 == 0 ? Color::Red : Color::Blue);
+				textBox2->Text = (ExtraData[0] % 2 == 0 ? "J1 X" : "J2 O");
 				//ARRAY TO GRAPHICAL button->Text
 				button1->Text = Convert::ToChar(Tablero[0]).ToString();
 				button6->Text = Convert::ToChar(Tablero[1]).ToString();
@@ -180,7 +222,8 @@ namespace tictactoeProyecto
 			Monitor::Exit(ExtraData);
 			Monitor::Exit(label2);
 			Monitor::Exit(label3);
-			Monitor::Exit(label4);
+			Monitor::Exit(textBox1);
+			Monitor::Exit(textBox2);
 			Monitor::Exit(button1);
 			Monitor::Exit(button3);
 			Monitor::Exit(button4);
@@ -196,25 +239,88 @@ namespace tictactoeProyecto
 		{
 		    //horizontal
 			if (Tablero[0] == PlayerToken && Tablero[1] == PlayerToken && Tablero[2] == PlayerToken)
+			{
+				button1->BackColor = Color::Green;
+				button1->ForeColor = Color::White;
+				button6->BackColor = Color::Green;
+				button6->ForeColor = Color::White;
+				button9->BackColor = Color::Green;
+				button9->ForeColor = Color::White;
 				return true;
+			}
 			else if (Tablero[3] == PlayerToken && Tablero[4] == PlayerToken && Tablero[5] == PlayerToken)
+			{
+				button2->BackColor = Color::Green;
+				button2->ForeColor = Color::White;
+				button5->BackColor = Color::Green;
+				button5->ForeColor = Color::White;
+				button8->BackColor = Color::Green;
+				button8->ForeColor = Color::White;
 				return true;
+			}
 			else if (Tablero[6] == PlayerToken && Tablero[7] == PlayerToken && Tablero[8] == PlayerToken)
+			{
+				button3->BackColor = Color::Green;
+				button3->ForeColor = Color::White;
+				button4->BackColor = Color::Green;
+				button4->ForeColor = Color::White;
+				button7->BackColor = Color::Green;
+				button7->ForeColor = Color::White;
 				return true;
+			}
 			//vertical
 			else if (Tablero[0] == PlayerToken && Tablero[3] == PlayerToken && Tablero[6] == PlayerToken)
+			{
+				button1->BackColor = Color::Green;
+				button1->ForeColor = Color::White;
+				button2->BackColor = Color::Green;
+				button2->ForeColor = Color::White;
+				button3->BackColor = Color::Green;
+				button3->ForeColor = Color::White;
 				return true;
-
+			}
 			else if (Tablero[1] == PlayerToken && Tablero[4] == PlayerToken && Tablero[7] == PlayerToken)
+			{
+				button4->BackColor = Color::Green;
+				button4->ForeColor = Color::White;
+				button6->BackColor = Color::Green;
+				button6->ForeColor = Color::White;
+				button5->BackColor = Color::Green;
+				button5->ForeColor = Color::White;
 				return true;
+			}
 			else if (Tablero[2] == PlayerToken && Tablero[5] == PlayerToken && Tablero[8] == PlayerToken)
+			{
+				button7->BackColor = Color::Green;
+				button7->ForeColor = Color::White;
+				button8->BackColor = Color::Green;
+				button8->ForeColor = Color::White;
+				button9->BackColor = Color::Green;
+				button9->ForeColor = Color::White;
 				return true;
+			}
 			//Diagonal IZQ
 			else if (Tablero[6] == PlayerToken && Tablero[4] == PlayerToken && Tablero[2] == PlayerToken)
+			{
+				button3->BackColor = Color::Green;
+				button3->ForeColor = Color::White;
+				button5->BackColor = Color::Green;
+				button5->ForeColor = Color::White;
+				button9->BackColor = Color::Green;
+				button9->ForeColor = Color::White;
 				return true;
+			}
 			//Diagonal Derecha
 			else if (Tablero[0] == PlayerToken && Tablero[4] == PlayerToken && Tablero[8] == PlayerToken)
+			{
+				button1->BackColor = Color::Green;
+				button1->ForeColor = Color::White;
+				button5->BackColor = Color::Green;
+				button5->ForeColor = Color::White;
+				button7->BackColor = Color::Green;
+				button7->ForeColor = Color::White;
 				return true;
+			}
 			else
 				return 0;
 		}
@@ -260,6 +366,24 @@ namespace tictactoeProyecto
 			{
 				Tablero[i] = 0;
 			}
+			button1->BackColor = Color::White;
+			button1->ForeColor = Color::Black;
+			button2->BackColor = Color::White;
+			button2->ForeColor = Color::Black;
+			button3->BackColor = Color::White;
+			button3->ForeColor = Color::Black;
+			button4->BackColor = Color::White;
+			button4->ForeColor = Color::Black;
+			button5->BackColor = Color::White;
+			button5->ForeColor = Color::Black;
+			button6->BackColor = Color::White;
+			button6->ForeColor = Color::Black;
+			button7->BackColor = Color::White;
+			button7->ForeColor = Color::Black;
+			button8->BackColor = Color::White;
+			button8->ForeColor = Color::Black;
+			button9->BackColor = Color::White;
+			button9->ForeColor = Color::Black;
 		}
 
 		void CleanUp() 
@@ -303,7 +427,7 @@ namespace tictactoeProyecto
 	protected:
 	private: System::Windows::Forms::Label^  label3;
 	private: System::Windows::Forms::Label^  label2;
-	private: System::Windows::Forms::Label^  label1;
+
 	private: System::Windows::Forms::Button^  button11;
 
 	private: System::Windows::Forms::Button^  button10;
@@ -332,9 +456,9 @@ namespace tictactoeProyecto
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			this->components = (gcnew System::ComponentModel::Container());
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->label2 = (gcnew System::Windows::Forms::Label());
-			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->button11 = (gcnew System::Windows::Forms::Button());
 			this->button10 = (gcnew System::Windows::Forms::Button());
 			this->button13 = (gcnew System::Windows::Forms::Button());
@@ -347,51 +471,44 @@ namespace tictactoeProyecto
 			this->button9 = (gcnew System::Windows::Forms::Button());
 			this->button8 = (gcnew System::Windows::Forms::Button());
 			this->button7 = (gcnew System::Windows::Forms::Button());
-			this->label4 = (gcnew System::Windows::Forms::Label());
 			this->button12 = (gcnew System::Windows::Forms::Button());
-			this->label5 = (gcnew System::Windows::Forms::Label());
-			this->label6 = (gcnew System::Windows::Forms::Label());
+			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
+			this->textBox2 = (gcnew System::Windows::Forms::TextBox());
+			this->contextMenuStrip1 = (gcnew System::Windows::Forms::ContextMenuStrip(this->components));
+			this->textBox3 = (gcnew System::Windows::Forms::TextBox());
+			this->button14 = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(553, 475);
+			this->label3->ForeColor = System::Drawing::Color::Black;
+			this->label3->Location = System::Drawing::Point(124, 334);
 			this->label3->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(87, 17);
+			this->label3->Size = System::Drawing::Size(104, 17);
 			this->label3->TabIndex = 30;
-			this->label3->Text = L"Player2Wins";
+			this->label3->Text = L"Ganadas J2 O:";
 			// 
 			// label2
 			// 
 			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(553, 449);
+			this->label2->ForeColor = System::Drawing::Color::Black;
+			this->label2->Location = System::Drawing::Point(124, 299);
 			this->label2->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(87, 17);
+			this->label2->Size = System::Drawing::Size(102, 17);
 			this->label2->TabIndex = 29;
-			this->label2->Text = L"Player1Wins";
+			this->label2->Text = L"Ganadas J1 X:";
 			this->label2->Click += gcnew System::EventHandler(this, &_GTO::label2_Click);
-			// 
-			// label1
-			// 
-			this->label1->AutoSize = true;
-			this->label1->ImageAlign = System::Drawing::ContentAlignment::MiddleRight;
-			this->label1->Location = System::Drawing::Point(307, 503);
-			this->label1->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
-			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(58, 17);
-			this->label1->TabIndex = 28;
-			this->label1->Text = L"status...";
 			// 
 			// button11
 			// 
 			this->button11->ForeColor = System::Drawing::Color::Black;
-			this->button11->Location = System::Drawing::Point(134, 161);
+			this->button11->Location = System::Drawing::Point(189, 179);
 			this->button11->Margin = System::Windows::Forms::Padding(4);
 			this->button11->Name = L"button11";
-			this->button11->Size = System::Drawing::Size(80, 28);
+			this->button11->Size = System::Drawing::Size(100, 28);
 			this->button11->TabIndex = 27;
 			this->button11->Text = L"Buscar";
 			this->button11->UseVisualStyleBackColor = true;
@@ -400,10 +517,10 @@ namespace tictactoeProyecto
 			// button10
 			// 
 			this->button10->ForeColor = System::Drawing::Color::Black;
-			this->button10->Location = System::Drawing::Point(134, 93);
+			this->button10->Location = System::Drawing::Point(189, 101);
 			this->button10->Margin = System::Windows::Forms::Padding(4);
 			this->button10->Name = L"button10";
-			this->button10->Size = System::Drawing::Size(80, 28);
+			this->button10->Size = System::Drawing::Size(100, 28);
 			this->button10->TabIndex = 25;
 			this->button10->Text = L"Crear ";
 			this->button10->UseVisualStyleBackColor = true;
@@ -412,7 +529,7 @@ namespace tictactoeProyecto
 			// button13
 			// 
 			this->button13->ForeColor = System::Drawing::Color::Black;
-			this->button13->Location = System::Drawing::Point(134, 334);
+			this->button13->Location = System::Drawing::Point(389, 324);
 			this->button13->Margin = System::Windows::Forms::Padding(4);
 			this->button13->Name = L"button13";
 			this->button13->Size = System::Drawing::Size(85, 28);
@@ -423,109 +540,107 @@ namespace tictactoeProyecto
 			// 
 			// button1
 			// 
-			this->button1->Location = System::Drawing::Point(46, 13);
+			this->button1->ForeColor = System::Drawing::Color::Black;
+			this->button1->Location = System::Drawing::Point(126, 59);
 			this->button1->Margin = System::Windows::Forms::Padding(4);
 			this->button1->Name = L"button1";
-			this->button1->Size = System::Drawing::Size(80, 84);
-			this->button1->TabIndex = 16;
+			this->button1->Size = System::Drawing::Size(70, 70);
+			this->button1->TabIndex = 20;
 			this->button1->UseVisualStyleBackColor = true;
 			this->button1->Click += gcnew System::EventHandler(this, &_GTO::button1_Click);
 			// 
 			// button2
 			// 
-			this->button2->Location = System::Drawing::Point(46, 105);
+			this->button2->ForeColor = System::Drawing::Color::Black;
+			this->button2->Location = System::Drawing::Point(126, 137);
 			this->button2->Margin = System::Windows::Forms::Padding(4);
 			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(80, 84);
+			this->button2->Size = System::Drawing::Size(70, 70);
 			this->button2->TabIndex = 17;
 			this->button2->UseVisualStyleBackColor = true;
 			this->button2->Click += gcnew System::EventHandler(this, &_GTO::button2_Click);
 			// 
 			// button3
 			// 
-			this->button3->Location = System::Drawing::Point(46, 197);
+			this->button3->ForeColor = System::Drawing::Color::Black;
+			this->button3->Location = System::Drawing::Point(127, 215);
 			this->button3->Margin = System::Windows::Forms::Padding(4);
 			this->button3->Name = L"button3";
-			this->button3->Size = System::Drawing::Size(80, 84);
+			this->button3->Size = System::Drawing::Size(70, 70);
 			this->button3->TabIndex = 18;
 			this->button3->UseVisualStyleBackColor = true;
 			this->button3->Click += gcnew System::EventHandler(this, &_GTO::button3_Click);
 			// 
 			// button6
 			// 
-			this->button6->Location = System::Drawing::Point(134, 13);
+			this->button6->ForeColor = System::Drawing::Color::Black;
+			this->button6->Location = System::Drawing::Point(204, 59);
 			this->button6->Margin = System::Windows::Forms::Padding(4);
 			this->button6->Name = L"button6";
-			this->button6->Size = System::Drawing::Size(80, 84);
+			this->button6->Size = System::Drawing::Size(70, 70);
 			this->button6->TabIndex = 19;
 			this->button6->UseVisualStyleBackColor = true;
 			this->button6->Click += gcnew System::EventHandler(this, &_GTO::button6_Click);
 			// 
 			// button5
 			// 
-			this->button5->Location = System::Drawing::Point(134, 105);
+			this->button5->ForeColor = System::Drawing::Color::Black;
+			this->button5->Location = System::Drawing::Point(204, 137);
 			this->button5->Margin = System::Windows::Forms::Padding(4);
 			this->button5->Name = L"button5";
-			this->button5->Size = System::Drawing::Size(80, 84);
+			this->button5->Size = System::Drawing::Size(70, 70);
 			this->button5->TabIndex = 20;
 			this->button5->UseVisualStyleBackColor = true;
 			this->button5->Click += gcnew System::EventHandler(this, &_GTO::button5_Click);
 			// 
 			// button4
 			// 
-			this->button4->Location = System::Drawing::Point(134, 197);
+			this->button4->ForeColor = System::Drawing::Color::Black;
+			this->button4->Location = System::Drawing::Point(205, 215);
 			this->button4->Margin = System::Windows::Forms::Padding(4);
 			this->button4->Name = L"button4";
-			this->button4->Size = System::Drawing::Size(80, 84);
+			this->button4->Size = System::Drawing::Size(70, 70);
 			this->button4->TabIndex = 21;
 			this->button4->UseVisualStyleBackColor = true;
 			this->button4->Click += gcnew System::EventHandler(this, &_GTO::button4_Click);
 			// 
 			// button9
 			// 
-			this->button9->Location = System::Drawing::Point(222, 14);
+			this->button9->ForeColor = System::Drawing::Color::Black;
+			this->button9->Location = System::Drawing::Point(282, 59);
 			this->button9->Margin = System::Windows::Forms::Padding(4);
 			this->button9->Name = L"button9";
-			this->button9->Size = System::Drawing::Size(80, 84);
+			this->button9->Size = System::Drawing::Size(70, 70);
 			this->button9->TabIndex = 22;
 			this->button9->UseVisualStyleBackColor = true;
 			this->button9->Click += gcnew System::EventHandler(this, &_GTO::button9_Click);
 			// 
 			// button8
 			// 
-			this->button8->Location = System::Drawing::Point(222, 106);
+			this->button8->ForeColor = System::Drawing::Color::Black;
+			this->button8->Location = System::Drawing::Point(282, 137);
 			this->button8->Margin = System::Windows::Forms::Padding(4);
 			this->button8->Name = L"button8";
-			this->button8->Size = System::Drawing::Size(80, 84);
+			this->button8->Size = System::Drawing::Size(70, 70);
 			this->button8->TabIndex = 23;
 			this->button8->UseVisualStyleBackColor = true;
 			this->button8->Click += gcnew System::EventHandler(this, &_GTO::button8_Click);
 			// 
 			// button7
 			// 
-			this->button7->Location = System::Drawing::Point(222, 198);
+			this->button7->ForeColor = System::Drawing::Color::Black;
+			this->button7->Location = System::Drawing::Point(283, 215);
 			this->button7->Margin = System::Windows::Forms::Padding(4);
 			this->button7->Name = L"button7";
-			this->button7->Size = System::Drawing::Size(80, 84);
+			this->button7->Size = System::Drawing::Size(70, 70);
 			this->button7->TabIndex = 24;
 			this->button7->UseVisualStyleBackColor = true;
 			this->button7->Click += gcnew System::EventHandler(this, &_GTO::button7_Click);
 			// 
-			// label4
-			// 
-			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(652, 404);
-			this->label4->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
-			this->label4->Name = L"label4";
-			this->label4->Size = System::Drawing::Size(42, 17);
-			this->label4->TabIndex = 33;
-			this->label4->Text = L"Turn:";
-			this->label4->Click += gcnew System::EventHandler(this, &_GTO::label4_Click);
-			// 
 			// button12
 			// 
 			this->button12->ForeColor = System::Drawing::Color::Black;
-			this->button12->Location = System::Drawing::Point(119, 290);
+			this->button12->Location = System::Drawing::Point(360, 59);
 			this->button12->Margin = System::Windows::Forms::Padding(4);
 			this->button12->Name = L"button12";
 			this->button12->Size = System::Drawing::Size(114, 36);
@@ -534,42 +649,68 @@ namespace tictactoeProyecto
 			this->button12->UseVisualStyleBackColor = true;
 			this->button12->Click += gcnew System::EventHandler(this, &_GTO::button12_Click);
 			// 
-			// label5
+			// textBox1
 			// 
-			this->label5->AutoSize = true;
-			this->label5->ImageAlign = System::Drawing::ContentAlignment::MiddleRight;
-			this->label5->Location = System::Drawing::Point(278, 422);
-			this->label5->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
-			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(104, 17);
-			this->label5->TabIndex = 35;
-			this->label5->Text = L"Bytes enviados";
+			this->textBox1->Location = System::Drawing::Point(12, 24);
+			this->textBox1->Name = L"textBox1";
+			this->textBox1->Size = System::Drawing::Size(84, 22);
+			this->textBox1->TabIndex = 37;
+			this->textBox1->Text = L"TURNO";
+			this->textBox1->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			this->textBox1->TextChanged += gcnew System::EventHandler(this, &_GTO::textBox1_TextChanged);
 			// 
-			// label6
+			// textBox2
 			// 
-			this->label6->AutoSize = true;
-			this->label6->ImageAlign = System::Drawing::ContentAlignment::MiddleRight;
-			this->label6->Location = System::Drawing::Point(280, 475);
-			this->label6->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
-			this->label6->Name = L"label6";
-			this->label6->Size = System::Drawing::Size(102, 17);
-			this->label6->TabIndex = 36;
-			this->label6->Text = L"bytes recividos";
+			this->textBox2->Location = System::Drawing::Point(12, 43);
+			this->textBox2->Name = L"textBox2";
+			this->textBox2->Size = System::Drawing::Size(84, 22);
+			this->textBox2->TabIndex = 38;
+			this->textBox2->Text = L"J1";
+			this->textBox2->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			this->textBox2->TextChanged += gcnew System::EventHandler(this, &_GTO::textBox2_TextChanged);
+			// 
+			// contextMenuStrip1
+			// 
+			this->contextMenuStrip1->ImageScalingSize = System::Drawing::Size(20, 20);
+			this->contextMenuStrip1->Name = L"contextMenuStrip1";
+			this->contextMenuStrip1->Size = System::Drawing::Size(61, 4);
+			this->contextMenuStrip1->Opening += gcnew System::ComponentModel::CancelEventHandler(this, &_GTO::contextMenuStrip1_Opening);
+			// 
+			// textBox3
+			// 
+			this->textBox3->ForeColor = System::Drawing::SystemColors::InfoText;
+			this->textBox3->Location = System::Drawing::Point(189, 12);
+			this->textBox3->Name = L"textBox3";
+			this->textBox3->Size = System::Drawing::Size(100, 22);
+			this->textBox3->TabIndex = 39;
+			this->textBox3->Text = L"ERES";
+			this->textBox3->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			// 
+			// button14
+			// 
+			this->button14->ForeColor = System::Drawing::Color::Black;
+			this->button14->Location = System::Drawing::Point(360, 12);
+			this->button14->Name = L"button14";
+			this->button14->Size = System::Drawing::Size(114, 34);
+			this->button14->TabIndex = 40;
+			this->button14->Text = L"AYUDA";
+			this->button14->UseVisualStyleBackColor = true;
+			this->button14->Click += gcnew System::EventHandler(this, &_GTO::button14_Click);
 			// 
 			// _GTO
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(707, 542);
+			this->ClientSize = System::Drawing::Size(479, 365);
 			this->ControlBox = false;
-			this->Controls->Add(this->label6);
-			this->Controls->Add(this->label5);
+			this->Controls->Add(this->button14);
+			this->Controls->Add(this->textBox3);
+			this->Controls->Add(this->textBox2);
+			this->Controls->Add(this->textBox1);
 			this->Controls->Add(this->button12);
-			this->Controls->Add(this->label4);
 			this->Controls->Add(this->button13);
 			this->Controls->Add(this->label3);
 			this->Controls->Add(this->label2);
-			this->Controls->Add(this->label1);
 			this->Controls->Add(this->button11);
 			this->Controls->Add(this->button10);
 			this->Controls->Add(this->button7);
@@ -609,14 +750,12 @@ namespace tictactoeProyecto
 	{
 		try
 		{
-			label1->Text = "Creating Server...";
 			_Socket = gcnew Socket(AddressFamily::InterNetwork, SocketType::Stream, ProtocolType::Tcp);
 			_Socket->Bind(gcnew IPEndPoint(0, 5000));
 			_Socket->Listen(0);
 			Cliente = _Socket->Accept();
 			if (Cliente != nullptr)
 			{
-				label1->Text = "MatchCreated";
 				IsServer = true;
 				player = 'X';
 				GameReady = true;
@@ -628,22 +767,37 @@ namespace tictactoeProyecto
 
 					array<Byte> ^data = gcnew array<Byte>(1);
 					int bytesS = Cliente->Receive(data, 1, SocketFlags::None);
-					label6->Text = bytesS.ToString();
 					if (data[0] == 43)
-					label1->Text = "Eres X";
+					textBox3->Text = "ERES J1 X";
+					textBox3->BackColor = Color::Red;
+					textBox3->ForeColor = Color::White;
 
 					NetworkThread->Start();
 				}
 
 				button10->Hide();
 				button11->Hide();
-
+				button1->Show();
+				button2->Show();
+				button3->Show();
+				button4->Show();
+				button5->Show();
+				button6->Show();
+				button7->Show();
+				button8->Show();
+				button9->Show();
+				button12->Show();
+				textBox1->Show();
+				textBox2->Show();
+				textBox3->Show();
+				label2->Show();
+				label3->Show();
 
 			}
 		}
 		catch (System::Net::Sockets::SocketException^ error)
 		{
-			label1->Text = String::Concat("Error:", error->ToString());
+			MessageBox::Show("Error");
 		}
 	}
 			 //Conect button
@@ -655,7 +809,6 @@ namespace tictactoeProyecto
 			Cliente->Connect(gcnew IPEndPoint(IPAddress::Parse("127.0.0.1"), 5000)); //TODO: cambiar esto por el campo de un textbox para la ip
 			if (Cliente->IsBound)
 			{
-				label1->Text = String::Concat("Conected to:", Cliente->RemoteEndPoint->ToString());
 				GameReady = true;
 				player = 'O';
 				//mandamos un mensaje
@@ -665,17 +818,33 @@ namespace tictactoeProyecto
 
 				if (bytesS > 0)
 				{
-					label1->Text = "Eres O";
+					textBox3->Text = "ERES J2 O";
+					textBox3->BackColor = Color::Blue;
+					textBox3->ForeColor = Color::White;
 				}
 				NetworkThread->Start();
-				label5->Text = bytesS.ToString();
 				button10->Hide();
 				button11->Hide();
+				button1->Show();
+				button2->Show();
+				button3->Show();
+				button4->Show();
+				button5->Show();
+				button6->Show();
+				button7->Show();
+				button8->Show();
+				button9->Show();
+				button12->Show();
+				textBox1->Show();
+				textBox2->Show();
+				textBox3->Show();
+				label2->Show();
+				label3->Show();
 			}
 		}
 		catch (System::Net::Sockets::SocketException^ error)
 		{
-			label1->Text = String::Concat("Error:", error->ToString());
+			MessageBox::Show("Error");
 		}
 	}
 
@@ -816,9 +985,27 @@ namespace tictactoeProyecto
 		Send();
 		CleanUp();
 	}
-private: System::Void label4_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void label4_Click(System::Object^  sender, System::EventArgs^  e) 
+{
 }
-private: System::Void label2_Click(System::Object^  sender, System::EventArgs^  e) {
+private: System::Void label2_Click(System::Object^  sender, System::EventArgs^  e) 
+{
+}
+private: System::Void label1_Click(System::Object^  sender, System::EventArgs^  e) 
+{
+}
+private: System::Void textBox1_TextChanged(System::Object^  sender, System::EventArgs^  e) 
+{
+}
+private: System::Void contextMenuStrip1_Opening(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) 
+{
+}
+private: System::Void textBox2_TextChanged(System::Object^  sender, System::EventArgs^  e) 
+{
+}
+private: System::Void button14_Click(System::Object^  sender, System::EventArgs^  e) 
+{
+	MessageBox::Show("Si presionas la opción CONECTAR se creará un servidor en donde tendrás que esperar a que otro jugador se conecte a el. \n \n Si presionas la opción BUSCAR podrás ingresar a un servidor que otro jugador haya abierto previamente. \n \n El juego consiste en lograr marcar tres casillas en ya seavertical, horizontal o en diagonal, en cuanto esto suceda el juego habrá finalizado \n \n Puedes retirarte en cualquier momento de la partida con el botón SALIR, en caso de que el jugador contrincante desee salir del juego se enviará un mensaje de error");
 }
 };
 }
