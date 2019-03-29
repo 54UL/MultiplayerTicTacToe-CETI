@@ -1,0 +1,3 @@
+﻿  _GTO.obj : /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
+  tictactoeProyecto.vcxproj -> C:\Users\lghhs\Documents\GitHub\MultiplayerTicTacToe-CETI\Muestra\tictactoeProyecto\x64\Debug\tictactoeProyecto.exe
+  tictactoeProyecto.vcxproj -> C:\Users\lghhs\Documents\GitHub\MultiplayerTicTacToe-CETI\Muestra\tictactoeProyecto\x64\Debug\tictactoeProyecto.pdb (Partial PDB)
